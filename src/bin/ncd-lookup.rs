@@ -1,6 +1,6 @@
-use clap::{App, Arg};
-use std::{fmt::Display, fs::File, io::{self, Write}, path::Path, process};
-use ncd::{NCDFileReader, NCDReadAccessor, StdNCDReadAccessor };
+use clap::{App, Arg, ArgMatches};
+use std::{fmt::Display, fs::File, io::{self, Write}, path::Path, process, time::Duration};
+use ncd::{CurlConfig, CurlNCDReadAccessor, NCDFileReader, NCDReadAccessor, StdNCDReadAccessor};
 
 fn die<E: Display>(value: E) -> ! {
     eprintln!("{}",value);
@@ -36,17 +36,35 @@ impl Source {
         }
     }
 
-    fn make_accessor(&self, path: &str) -> io::Result<Box<dyn NCDReadAccessor>> {
-        let file_path = Path::new(path);
-        if !file_path.exists() {
-           die(format!("No such file: {}",path)); 
-        }
-        let file = File::open(file_path)?;
+    fn make_accessor(&self, path: &str, curl_config: &CurlConfig) -> io::Result<Box<dyn NCDReadAccessor>> {
         Ok(match self {
-            Source::File => Box::new(StdNCDReadAccessor::new(file)?),
-            Source::Http => Box::new(StdNCDReadAccessor::new(file)?)
+            Source::File => {
+                let file_path = Path::new(path);
+                if !file_path.exists() {
+                   die(format!("No such file: {}",path)); 
+                }        
+                let file = File::open(file_path)?;
+                Box::new(StdNCDReadAccessor::new(file)?)
+            },
+            Source::Http => {
+                // XXX ocnfigurable
+                Box::new(CurlNCDReadAccessor::new(curl_config,path)?)
+            }
         })
     }
+}
+
+fn str_to_u32(s: &str) -> Result<u32,String> {
+    s.parse::<u32>().map_err(|e| format!("Invalid integer: {}",e))
+}
+
+fn make_curl_config(matches: &ArgMatches) -> CurlConfig {
+    let mut config = CurlConfig::new();
+    if let Some(timeout) = matches.value_of("timeout") {
+        let timeout = die_on_error(str_to_u32(timeout));
+        config = config.connect_timeout(Duration::from_millis(timeout as u64));
+    }
+    config
 }
 
 pub fn make_app() -> App<'static,'static> {
@@ -69,11 +87,17 @@ pub fn make_app() -> App<'static,'static> {
             .help("specify source type (optional: will guess)")
             .takes_value(true)
             .possible_value("file")
-            //.possible_value("http")
+            .possible_value("http")
             .possible_value("guess")
             .default_value("guess")
         )
-}
+        .arg(Arg::with_name("timeout")
+            .short("-t")
+            .long("--timeout")
+            .help("specify timeout for remote methods (ms)")
+            .takes_value(true)
+        )
+    }
 
 fn main() {
     let app = make_app();
@@ -81,7 +105,8 @@ fn main() {
     let path = matches.value_of("PATH").unwrap();
     let key =  matches.value_of("KEY").unwrap().as_bytes();
     let source_type = Source::new(matches.value_of("source"),path);
-    let accessor = die_on_error(source_type.make_accessor(path));
+    let curl_config = make_curl_config(&matches);
+    let accessor = die_on_error(source_type.make_accessor(path,&curl_config));
     let mut reader = die_on_error(NCDFileReader::new_box(accessor));
     let value = die_on_error(reader.get(key));
     if let Some(value) = value.as_ref() {
