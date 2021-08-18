@@ -1,6 +1,6 @@
 use clap::{App, Arg, ArgMatches};
 use std::{fmt::Display, fs::File, io::{self, Write}, path::Path, process, time::Duration};
-use ncd::{CurlConfig, CurlNCDReadAccessor, NCDFileReader, NCDReadAccessor, StdNCDReadAccessor};
+use ncd::{CurlConfig, CurlNCDReadAccessor, NCDReader, NCDReadAccessor, StdNCDReadAccessor};
 
 fn die<E: Display>(value: E) -> ! {
     eprintln!("{}",value);
@@ -107,7 +107,7 @@ fn main() {
     let source_type = Source::new(matches.value_of("source"),path);
     let curl_config = make_curl_config(&matches);
     let accessor = die_on_error(source_type.make_accessor(path,&curl_config));
-    let mut reader = die_on_error(NCDFileReader::new_box(accessor));
+    let mut reader = die_on_error(NCDReader::new_box(accessor));
     let value = die_on_error(reader.get(key));
     if let Some(value) = value.as_ref() {
         die_on_error(io::stdout().write_all(value));
