@@ -8,4 +8,5 @@ edition = "2018"
 [dependencies]
 clap="*"
 infer="*"
-ncd={ version="*", path="../ncd" } # XXX
+ncd={ version="*", git="https://github.com/ens-ds23/ncd" }
+
