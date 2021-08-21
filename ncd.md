@@ -5,7 +5,13 @@ work, the other is more difficult but more widely applicable.
 
 ## Installing from binary (Easy)
 
+Clone ncd-tools
 
+`$ git clone https://github.com/ens-ds23/ncd-tools.git`
+
+Add the following to your `PATH`:
+
+ * For codon `$HOME/ncd-tools/pre-builds/codon`
 
 ## Installing from source (Harder)
 
