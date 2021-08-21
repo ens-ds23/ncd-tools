@@ -40,15 +40,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
-name = "bincode"
-version = "1.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
-dependencies = [
- "serde",
-]
-
-[[package]]
 name = "bitflags"
 version = "1.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -139,17 +130,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gnudbm"
-version = "0.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2de6e26257eac9de58fa751c2370b4bedb5bddfc99e0e62f7c91c3857bacc8d5"
-dependencies = [
- "bincode",
- "libc",
- "serde",
-]
-
-[[package]]
 name = "hermit-abi"
 version = "0.1.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -199,13 +179,12 @@ checksum = "3ead5388e485d38e622630c6b05afd3761a6701ff15c55b279ea5b31dcb62cff"
 
 [[package]]
 name = "ncd"
-version = "0.1.0"
-source = "git+https://github.com/ens-ds23/ncd#b7ff8dce65ecfd3399514c07784883e39388f26b"
+version = "0.1.1"
+source = "git+https://github.com/ens-ds23/ncd#0a4c9d666097d9cb7dd607d3c4fd5008e6889ed0"
 dependencies = [
  "async-trait",
  "byteorder",
  "curl",
- "gnudbm",
  "murmur3",
  "rand",
  "tempfile",
@@ -336,12 +315,6 @@ dependencies = [
  "lazy_static",
  "winapi",
 ]
-
-[[package]]
-name = "serde"
-version = "1.0.127"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f03b9878abf6d14e6779d3f24f07b2cfa90352cfec4acc5aab8f1ac7f146fae8"
 
 [[package]]
 name = "socket2"

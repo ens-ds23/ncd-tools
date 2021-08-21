@@ -2,7 +2,7 @@ use std::{fmt::Display, fs::File, io, path::Path, process};
 
 use clap::{App, Arg, ArgMatches};
 use infer::Infer;
-use ncd::{NCDBuild, NCDBuildConfig, NCDFlatConfig, NCDFlatSource, NCDGdbmSource, NCDValueSource};
+use ncd::{NCDBuild, NCDBuildConfig, NCDFlatConfig, NCDFlatSource, NCDValueSource};
 
 fn looks_like_utf8(bytes: &[u8]) -> bool {
     for b in bytes {
@@ -22,14 +22,12 @@ fn looks_like_utf8(bytes: &[u8]) -> bool {
 
 #[derive(Debug)]
 enum Format {
-    Flat,
-    Gdbm
+    Flat
 }
 
 impl Format {
     fn from_cli(name: &str, path: &str) -> Format {
         match name {
-            "gdbm" => Format::Gdbm,
             "flat" => Format::Flat,
             "guess" => {
                 if let Some(format) = guess_format(path) {
@@ -46,7 +44,6 @@ impl Format {
 
     fn from_mime_type(mime_type: &str) -> Option<Format> {
         match mime_type {
-            "application/x-gdbm" => Some(Format::Gdbm),
             "text/plain" => Some(Format::Flat),
             _ => None
         }
@@ -57,20 +54,14 @@ impl Format {
             Format::Flat => {
                 Box::new(NCDFlatSource::new(Path::new(path),flat_config)?)
             },
-            Format::Gdbm => {
-                Box::new(NCDGdbmSource::new(Path::new(path))?)
-            }
         })
     }
 }
 
 fn guess_format(path: &str) -> Option<Format> {
     let mut inferer = Infer::new();
-    inferer.add("text/plain",".gdbm",|bytes| {
+    inferer.add("text/plain",".txt",|bytes| {
         looks_like_utf8(bytes)
-    });
-    inferer.add("application/x-gdbm",".gdbm",|b| {
-        &b[1..4] == &[0x9a,0x57,0x13] && ( b[0] == 0xcd || b[0] == 0xce || b[0] == 0xcf)
     });
     let value = die_on_error(inferer.get_from_path(path));
     value.and_then(|value| Format::from_mime_type(value.mime_type()))
