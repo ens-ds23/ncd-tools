@@ -273,7 +273,9 @@ fn main() {
     let mut builder = die_on_error(NCDBuild::new(&build_config,source.as_ref(),&output_path));
     loop {
         println!("Attempting to build: {}",builder.describe_attempt());
-        let success = die_on_error(builder.attempt());
+        let success = die_on_error(builder.attempt(|records,time| {
+            println!("  wrote {:.2}M records in {:.1}s",records/1000000,time);
+        }));
         println!("  {}",builder.result());
         if success { break }
     }

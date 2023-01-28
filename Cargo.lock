@@ -179,8 +179,8 @@ checksum = "3ead5388e485d38e622630c6b05afd3761a6701ff15c55b279ea5b31dcb62cff"
 
 [[package]]
 name = "ncd"
-version = "0.1.1"
-source = "git+https://github.com/ens-ds23/ncd#0a4c9d666097d9cb7dd607d3c4fd5008e6889ed0"
+version = "0.1.2"
+source = "git+https://github.com/ens-ds23/ncd#bd5ac8edb2b4ff15110b1bbdf08aabc0ad4069d8"
 dependencies = [
  "async-trait",
  "byteorder",

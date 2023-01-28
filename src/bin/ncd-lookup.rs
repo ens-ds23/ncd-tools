@@ -47,7 +47,7 @@ impl Source {
                 Box::new(StdNCDReadAccessor::new(file)?)
             },
             Source::Http => {
-                // XXX ocnfigurable
+                // TODO configurable
                 Box::new(CurlNCDReadAccessor::new(curl_config,path)?)
             }
         })
